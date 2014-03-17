@@ -180,4 +180,18 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
         Resque_Redis::prefix('resque');
         $this->assertEquals(Resque::size($queue), 0);        
 	}
+	
+	/**
+	 * @expectedException Resque_Exception
+	 */
+	public function testJobWithCreditClientOptions()
+	{
+		$this->assertTrue(Resque::setClientOptions(array(Resque_Redis::READ_TIMEOUT => 15, Resque_Redis::MAX_CONNECTION_RETRIES => 2)));
+		$this->assertTrue((bool)Resque::enqueue('jobs', 'Test_Job'));
+		
+		// try a bad key 
+		Resque::setClientOptions(array('invalidKey' => true));
+		$this->assertTrue((bool)Resque::enqueue('jobs', 'Test_Job'));
+	}
+	
 }

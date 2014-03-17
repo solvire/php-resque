@@ -39,6 +39,13 @@ if(!empty($REDIS_BACKEND)) {
         Resque::setBackend($REDIS_BACKEND, $REDIS_BACKEND_DB);
 }
 
+// JSON encoded redis client options (array form) 
+$CREDIS_OPTIONS = json_decode(getenv('CREDIS_OPTIONS'));
+if(!empty($CREDIS_OPTIONS) && $CREDIS_OPTIONS !== false) {
+    $logger->log(Psr\Log\LogLevel::INFO, 'Credis client options {options}.', array('options' => getenv('CREDIS_OPTIONS')));
+    Resque::setClientOptions($CREDIS_OPTIONS);
+}
+
 $logLevel = false;
 $LOGGING = getenv('LOGGING');
 $VERBOSE = getenv('VERBOSE');

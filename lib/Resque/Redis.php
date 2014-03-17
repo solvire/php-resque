@@ -79,6 +79,9 @@ class Resque_Redis
 	// msetnx
 	// mset
 	// renamenx
+	
+	const READ_TIMEOUT = 'readTimeout';
+	const MAX_CONNECTION_RETRIES = 'maxConnectionRetries';
 
 	/**
 	 * Set Redis namespace (prefix) default: resque
@@ -92,10 +95,19 @@ class Resque_Redis
 	    self::$defaultNamespace = $namespace;
 	}
 
-	public function __construct($server, $database = null)
+	/**
+	 * 
+	 * @param string $server
+	 * @param string $database
+	 * @param array $options - Credis Options
+	 */
+	public function __construct($server, $database = null, $options = array())
 	{
 		$this->server = $server;
 		$this->database = $database;
+		
+		$readTimeout = isset($options[self::READ_TIMEOUT]) ? $options[self::READ_TIMEOUT] : null;
+		$maxConnectionRetries = isset($options[self::MAX_CONNECTION_RETRIES]) ? $options[self::MAX_CONNECTION_RETRIES] : null;
 
 		if (is_array($this->server)) {
 			$this->driver = new Credis_Cluster($server);
@@ -126,6 +138,12 @@ class Resque_Redis
 			if (isset($password)){
 				$this->driver->auth($password);
 			}
+			
+			if($readTimeout)
+				$this->driver->setReadTimeout($readTimeout);
+			
+			if($maxConnectionRetries)
+				$this->driver->setMaxConnectRetries($maxConnectionRetries);
 		}
 
 		if ($this->database !== null) {
@@ -173,5 +191,6 @@ class Resque_Redis
         }
         return $string;
     }
+    
 }
 ?>

@@ -27,6 +27,18 @@ class Resque
 	 * @var int ID of Redis database to select.
 	 */
 	protected static $redisDatabase = 0;
+	
+	/**
+	 * @var array $availableClientOptions
+	 */
+	protected static $availableClientOptions = array(
+			Resque_Redis::READ_TIMEOUT, 
+			Resque_Redis::MAX_CONNECTION_RETRIES );
+	
+	/**
+	 * @var array $clientOptions
+	 */
+	protected static $clientOptions = array();
 
 	/**
 	 * Given a host/port combination separated by a colon, set it as
@@ -42,7 +54,27 @@ class Resque
 		self::$redisDatabase = $database;
 		self::$redis         = null;
 	}
-
+	
+	/**
+	 * Ability to provide options that can make their way to the credis client
+	 * 
+	 * @param array $options
+	 */
+	public static function setClientOptions($options)
+	{
+		if(!is_array($options))
+			throw new Resque_Exception('Options parameter is invalid.');
+		
+		foreach($options as $key => $option)
+		{
+			if(!in_array($key, self::$availableClientOptions))
+				throw new Resque_Exception("Options key $key is invalid.");
+		}
+		
+		self::$clientOptions = $options;
+		return true;
+	}
+	
 	/**
 	 * Return an instance of the Resque_Redis class instantiated for Resque.
 	 *
@@ -59,7 +91,7 @@ class Resque
 			$server = 'localhost:6379';
 		}
 
-		self::$redis = new Resque_Redis($server, self::$redisDatabase);
+		self::$redis = new Resque_Redis($server, self::$redisDatabase, self::$clientOptions);
 		return self::$redis;
 	}
 	

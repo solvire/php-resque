@@ -268,6 +268,17 @@ use a custom prefix to separate the Resque data:
 $ PREFIX=my-app-name bin/resque
 ```
 
+### Credis Client Options ###
+
+The redis specific communication settings can be adjusted given the example 
+command line options. Only the two below are supported now. The data is delivered 
+via a JSON encoded array. More options can be passed down into the client once 
+functionality is surfaced. 
+
+```sh
+$ CREDIS_OPTIONS='{"readTimeout":5,"maxConnectionRetries":3}' bin/resque
+``` 
+
 ### Forking ###
 
 Similarly to the Ruby versions, supported platforms will immediately
